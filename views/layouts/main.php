@@ -39,13 +39,12 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
             ['label' => 'Every Day', 'url' => ['/site/every-day']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
             ['label' => 'Sign Up', 'url' => ['/site/sign-up']],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
+                
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post')
                 . Html::submitButton(

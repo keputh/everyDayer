@@ -22,13 +22,17 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                'denyCallback' => function ($rule, $action) {
+                    throw new \Exception('У вас нет доступа к этой странице');
+                },
+                'only' => ['logout', 'every-day'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'every-day'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
+
                 ],
             ],
             'verbs' => [
@@ -94,12 +98,14 @@ class SiteController extends Controller
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
+
         $model = new SignUpForm();
 
         if($model->load(\Yii::$app->request->post()) && $model->validate()){
             $user = new User();
             $user->username = $model->username;
-            $user->password = \Yii::$app->security->generatePasswordHash($model->password);
+            $user->email = $model->email;
+            $user->password = $model->password; //\Yii::$app->getSecurity()->generatePasswordHash($model->password);
             if($user->save()){
                 return $this->goHome();
             }
@@ -118,33 +124,6 @@ class SiteController extends Controller
         return $this->goHome();
     }
 
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
 
     public function actionEveryDay()
     {
